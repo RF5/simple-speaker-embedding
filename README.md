@@ -78,6 +78,17 @@ sampling_rate  :  22050
 mel_fmin  :  0
 mel_fmax  :  8000.0
 min_log_value  :  -11.52
-max_log_value  :  1.2
-silence_threshold_db  :  -10
 ```
+All this information pertains to the settings of the Tacotron Mel-spectrogarm transform, except for the `min_log_value`, which is used by the model to normalize any input log Mel-scale spectrograms.
+
+When using `melspec_from_file('example.wav')`, `example.wav` is automatically resampled to the correct sampling rate. However, if obtaining the mel-spectrogram from a torch array, please remember to resample the utterance first to 22050Hz. 
+
+# Training
+The model is trained on the combined VCC 2018, VCTK, Librispeech, and CommonVoice English datasets, using Fastai. 
+
+To train the model:
+1. Download these datasets
+2. Precompute the log Mel-scale spectrograms for every utterance in each dataset
+3. Save these precomputed spectrograms in a different folder for each dataset, with subfolders for each speaker.
+4. Run the code in the training notebook `training.ipynb`
+
