@@ -6,9 +6,6 @@ from torch.autograd import Variable
 from scipy.signal import get_window
 from librosa.util import pad_center
 from librosa.filters import mel as librosa_mel_fn
-import torchaudio
-
-import os
 
 class STFT(torch.nn.Module):
     """adapted from Prem Seetharaman's https://github.com/pseeth/pytorch-stft"""
