@@ -36,7 +36,7 @@ def gru_embedder(pretrained=True, progress=True, **kwargs):
     model = GRUEmbedder(**kwargs)
     if pretrained:
 
-        state = torch.hub.load_state_dict_from_url("https://github.com/RF5/simple-speaker-embedding/releases/download/0.1/gru-big-d0a8e22e.pth", 
+        state = torch.hub.load_state_dict_from_url("https://github.com/RF5/simple-speaker-embedding/releases/download/0.1/gru-wrapped-f1f850.pth", 
                                                 progress=progress)
         # state = torch.load('weights/resnet34.pth')
         model.load_state_dict(state)
