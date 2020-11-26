@@ -37,7 +37,7 @@ class MelspecTransform():
         self.normalize = normalize
 
         if resample: self.sampling_rate = int(resample)
-        if loader == 'librosa': self.loader = librosa_load_file
+        if loader == 'librosa': self.loader = lambda x: librosa_load_file(x, target_sr=self.sampling_rate)
         elif loader == 'scipy': self.loader = scipy_load_file
         elif loader == 'torchaudio': self.loader = torchaudio_load_file
         else: raise NotImplementedError("Loading method not implemented!")
@@ -51,8 +51,9 @@ class MelspecTransform():
         """ Get mel spectrogram from array of waveform magnitude samples """
         if self.normalize: data = 0.95*(data / abs(data).max())
 
+        print(sr, self.stft.sampling_rate)
         if sr != self.stft.sampling_rate:
-            raise ValueError("{} {} SR doesn't match target {} SR".format(
+            raise ValueError("{} SR doesn't match target {} SR".format( \
                 sr, self.stft.sampling_rate))
         audio_norm = data.clamp(-1, 1)
         audio_norm = torch.autograd.Variable(audio_norm, requires_grad=False)

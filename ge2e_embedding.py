@@ -7,6 +7,7 @@ from hparams import hp
 class GRUEmbedder(nn.Module):
     
     def __init__(self, **kwargs):
+        super().__init__()
         self.model = SpeakerEmbedderGRU()
         self.hparams = hp.audio_waveglow
         self.melspec_tfm = MelspecTransform(self.hparams, **kwargs)
@@ -35,9 +36,9 @@ def gru_embedder(pretrained=True, progress=True, **kwargs):
     model = GRUEmbedder(**kwargs)
     if pretrained:
 
-        # state = torch.hub.load_state_dict_from_url("https://github.com/RF5/danbooru-pretrained/releases/download/v0.1/resnet34-88a5e79d.pth", 
-                                                # progress=progress)
-        state = torch.load('weights/resnet34.pth')
+        state = torch.hub.load_state_dict_from_url("https://github.com/RF5/simple-speaker-embedding/releases/download/0.1/gru-big-d0a8e22e.pth", 
+                                                progress=progress)
+        # state = torch.load('weights/resnet34.pth')
         model.load_state_dict(state)
 
     return model
