@@ -79,7 +79,8 @@ mel_fmin  :  0
 mel_fmax  :  8000.0
 min_log_value  :  -11.52
 ```
-All this information pertains to the settings of the Tacotron Mel-spectrogarm transform, except for the `min_log_value`, which is used by the model to normalize any input log Mel-scale spectrograms.
+All this information pertains to the settings of the Tacotron Mel-spectrogarm transform, except for the `min_log_value`, which is used by the model to normalize any input log Mel-scale spectrograms. 
+You can disable this scaling by providing the `normalize=False` argument in the `torch.hub.load` call -- in which case the `model.forward()` method assumes the input has already been scaled using this `min_log_value` to roughly be between -1 and 1.
 
 When using `melspec_from_file('example.wav')`, `example.wav` is automatically resampled to the correct sampling rate. However, if obtaining the mel-spectrogram from a torch array, please remember to resample the utterance first to 22050Hz. 
 
