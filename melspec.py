@@ -51,7 +51,6 @@ class MelspecTransform():
         """ Get mel spectrogram from array of waveform magnitude samples """
         if self.normalize: data = 0.95*(data / abs(data).max())
 
-        print(sr, self.stft.sampling_rate)
         if sr != self.stft.sampling_rate:
             raise ValueError("{} SR doesn't match target {} SR".format( \
                 sr, self.stft.sampling_rate))
