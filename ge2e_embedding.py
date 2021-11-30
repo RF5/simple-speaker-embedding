@@ -26,9 +26,9 @@ class GRUEmbedder(nn.Module):
         """ Convert file path `x` to a [n_frames, n_mels] shape mel-spectrogram tensor """
         return self.melspec_tfm.from_file(x).T
     
-    def melspec_from_array(self, x):
+    def melspec_from_array(self, x, sr):
         """ Convert a 1D torch tensor in to a [n_frames, n_mels] shape mel-spectrogram tensor """
-        return self.melspec_tfm.from_array(x).T
+        return self.melspec_tfm.from_array(x, sr).T
 
     def print_hparams(self):
         for key in self.hparams.__dict__():
