@@ -2,21 +2,25 @@
 A speaker embedding network in Pytorch that is very quick to set up and use for whatever purposes.
 
 ## What?
-A Pytorch model that takes in a log Mel-scale spectrogram and returns a 256-dimensional real vector of unit length known as an _embedding_ for the input speaker.
+Pytorch models that takes in a waveform or log Mel-scale spectrogram and returns a 256-dimensional real vector of unit length known as an _embedding_ for the input speaker.
 The vector is trained to be unique to the speaker identity of the input utterance -- so the returned vector should remain the same regardless of _what_ words are spoken in the input utterance, and depend only on the _speaker identity_ of who is speaking in the input utterance.
 
-For example, if an input utterance saying "The quick brown fox" spoken by **speaker A** is fed into the model, the resulting 256-dimensional embedding should be close (in terms of Euclidean distance) to the embedding of an utterance saying "I like speaker embeddings" also spoken by **speaker A**. 
-Conversely, the embedding should be far away (in terms of Euclidean distance) from the embedding of an utterance saying the same "The quick brown fox" spoken by **speaker B**.
+For example, if an input utterance saying "The quick brown fox" spoken by **speaker A** is fed into the model, the resulting 256-dimensional embedding should be close (in terms of cosine/Euclidean distance) to the embedding of an utterance saying "I like speaker embeddings" also spoken by **speaker A**. 
+Conversely, the embedding should be far away (in terms of cosine/Euclidean distance) from the embedding of an utterance saying the same "The quick brown fox" spoken by **speaker B**.
 Thus the embedding should be unique to the identity of the speaker of an input utterance, and not the linguistic content of the input utterance.
 This is the behavior provided by the models in this repo.
 
+## Models
+This repo provides two pretrained models:
+1. A `GRU` recurrent model (3 layers, 786 hidden units each) which operates on log Mel-scale spectrogram frames computed from 22.05kHz sampled audio.
+2. A `ConvGRU` model which consists of an initial convolutional network into a GRU (3 layers, 786 hidden units each). This network operates on raw, un-normalized 16kHz waveforms. 
+
 **Quick info**:
 - The input utterance can be of arbitrary length, although fairly short (5-10s) work best.
-- For a most robust embedding generate several embedding vectors from multiple utterances/recordings and then take the mean of these vectors. Finally, scale the mean vector to again be of unit length. 
-- The pretrained model works well on _unseen_ speakers. In other words, it generates reasonable and well-behaved embeddings for utterances by speakers never seen during training.
+- Speaker embeddings can be made more robust by taking the mean embedding from multiple utterances from the same speaker. Finally, scale the mean vector to again be of unit length. 
+- The pretrained model works reasonably well on _unseen_ speakers. In other words, it generates reasonable and well-behaved embeddings for utterances by speakers never seen during training. You may improve it by fine-tuning on a new dataset, but it isn't strictly necessary.
 - The model is trained with the [GE2E loss](https://arxiv.org/abs/1710.10467) introduced for speaker verification, using the loss function [implementation provided by HarryVolek](https://arxiv.org/abs/1710.10467)
-- The pretrained model currently available is a 3-layer GRU model with 768 hidden units in each layer. 
-- The log Mel-scale spectrogram transform used is based on the ones used by Tacotron, and the transform functionality is bundled with the model in pytorch hub.
+- The log Mel-scale spectrogram transform used is based on the ones used by Tacotron, and the transform functionality is bundled with the model in pytorch hub for the GRU model which operates on spectrograms.
 
 # Quick start
 No cloning repos or downloading notebooks needed! Simply:
@@ -66,9 +70,14 @@ The model is not perfect and fails under some conditions:
 - If the input utterance is very long (>1min), then the model also becomes rather unstable.
 - If the input utterance contains long portions of silence then the resulting embeddings lose meaning. 
 
-# Hyperparameters
+# Data hyperparameters
+The input to each model has certain hyperparameters for how it should be preprocessed before feeding it to the model.
 
-The hyperparameters of the model mainly include choices of actions involving the mel-spectrogram transform. To view them, simply go `model.print_hparams()`. It will return something like:
+## 16kHz model: ConvGRU embedder
+The ConvGRU model only assumes that any input waveform are floating point numbers between -1.0 and 1.0 sampled at 16kHz. You may wish to normalize the volume to ensure very soft audio is scaled up, but it is not strictly necessary and performance will still be good.
+
+## 22.05kHz model: GRU embedder
+For the 22.05kHz GRU model operating on mel-spectrograms, the hyperparameters correspond to the choices for computing and normalizing the mel-spectrogram transform. To view them, simply go `model.print_hparams()`. It will return something like:
 ```python
 filter_length  :  1024
 hop_length  :  256
@@ -85,7 +94,44 @@ You can disable this scaling by providing the `normalize=False` argument in the 
 When using `melspec_from_file('example.wav')`, `example.wav` is automatically resampled to the correct sampling rate. However, if obtaining the mel-spectrogram from a torch array, please remember to resample the utterance first to 22050Hz. 
 
 # Training
-The model is trained on the combined VCC 2018, VCTK, Librispeech, and CommonVoice English datasets, using Fastai. 
+The latest model is trained on VCTK, Librispeech, voxceleb1 and voxceleb2. To train the model, what you need is a csv of the following format:
+
+```csv
+path,speaker
+<path to wav>,<speaker id>
+<path to wav>,<speaker id>
+```
+Where the `path` is a file path to a wav/flac/mp3 or other audio file, and `speaker` is the speaker name/id to which that waveform path belongs. For best results, ensure that each speaker has at least 20+ waveforms associated with it. 
+
+## Constructing data
+The `split_data.py` script constructs a training and validation csv of this format from the datasets specified above. Namely it has the available arguments:
+
+```
+split_data.py  [--librispeech_path LIBRISPEECH_PATH] [--vctk_path VCTK_PATH]
+               [--commonvoice_path COMMONVOICE_PATH] [--vox1_path VOX1_PATH]
+               [--vox2_path VOX2_PATH] [--seed SEED] [--valid_spks VALID_SPKS]
+```
+
+If a path to a dataset is specified, its associated waveforms are included in the train/validation csvs it produces. It should be fairly trivial to modify this for your own custom speech dataset format.
+
+## Training and logging
+The `train.py` script trains the model. It has additional dependencies: `omegaconf`, `fastprogress`, `pandas`. 
+To see all settings and config options, just run `python train.py --help`. All config options can be set or overridden with command line arguments. For example, training the convolutional GRU model was done with:
+
+```bash
+python train.py checkpoint_path=runs/sse2 train_csv=splits/train.csv.zip  \
+                valid_csv=splits/valid.csv.zip max_seq_len=120000 fp16=True \
+                batch_size=9 distributed.n_gpus_per_node=3 start_lr=1e-8 \
+                max_lr=4e-5 end_lr=1e-7 n_epochs=2000 validation_interval=2500
+```
+
+The train script supports both single and multi-GPU training, FP16 training, gradient clipping, tensorboard logging and more. Please see the `--help` command for all config options. The required arguments are:
+- `checkpoint_path` -- the path on which to log tensorboard metrics and save checkpoints.
+- `train_csv` -- data csv for training.
+- `valid_csv` -- data csv for validation. 
+
+## Old training procedure
+The older GRU model trained on log Mel-scale spectrograms is trained on the combined VCC 2018, VCTK, Librispeech, and CommonVoice English datasets, using Fastai. 
 
 To train the model:
 1. Download these datasets
