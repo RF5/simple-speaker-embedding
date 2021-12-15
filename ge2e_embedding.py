@@ -68,7 +68,8 @@ class ConvGRUEmbedder(nn.Module):
         """ Takes in set of 16kHz waveforms (bs, n_samples) and returns (bs, 256) speaker embeddings """
         x = x.clamp(-1.0 , 1.0)
         x = x.to(self.device)
-        return self.model(x)
+        lengths = torch.ones((1,), dtype=torch.long, device=x.device)*x.shape[-1]
+        return self.model(x, lengths)
 
     def print_hparams(self):
         from omegaconf import OmegaConf

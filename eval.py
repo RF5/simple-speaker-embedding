@@ -14,7 +14,7 @@ def eval(args):
     if args.model == 'gru_embedder':
         model = torch.hub.load('RF5/simple-speaker-embedding', 'gru_embedder')
     elif args.model == 'convgru_embedder':
-        model = torch.hub.load('RF5/simple-speaker-embedding', 'convgru_embedder')
+        model = torch.hub.load('RF5/simple-speaker-embedding', 'convgru_embedder', force_reload=True)
     else: raise NotImplementedError()
     print(args)
     model = model.eval().to(args.device)
@@ -48,8 +48,12 @@ def eval(args):
                 x1_emb = model(mel[None])[0]
                 x2_emb = model(mel2[None])[0]
             elif args.model == 'convgru_embedder':
-                audio = librosa.load(row.path, sr=16000)
-                audio2 = librosa.load(targ_path, sr=16000)
+                audio, _ = librosa.load(row.path, sr=16000)
+                audio = torch.from_numpy(audio).float().to(args.device)
+
+                audio2, _ = librosa.load(targ_path, sr=16000)
+                audio2 = torch.from_numpy(audio2).float().to(args.device)
+
                 x1_emb = model(audio[None])[0]
                 x2_emb = model(audio2[None])[0]
             cosim = F.cosine_similarity(x1_emb, x2_emb, dim=-1).cpu()
@@ -62,13 +66,13 @@ def eval(args):
         "| ------ | ----- | \n"
         f"| EER    | {eer:5.4f} |"
     ))
-    print("\nNow plotting results as a UMAP figure for 8 speakers with 6 utterances each.")
+    print("\nNow plotting results as a UMAP figure for 8 speakers with 8 utterances each.")
     speakers = list(test_df.speaker.unique())
-    random.sample(speakers, k=8)
+    speakers = random.sample(speakers, k=8)
     spk_dict = {}
     for s in progress_bar(speakers):
         _df = test_df[test_df.speaker == s]
-        paths = random.sample(list(_df.path), k=6)
+        paths = random.sample(list(_df.path), k=8)
         embs = []
         for p in paths:
             with torch.no_grad():
@@ -76,14 +80,15 @@ def eval(args):
                     mel = model.melspec_from_file(p).to(args.device)
                     x1_emb = model(mel[None])[0]
                 elif args.model == 'convgru_embedder':
-                    audio = librosa.load(p, sr=16000)
+                    audio, _ = librosa.load(p, sr=16000)
+                    audio = torch.from_numpy(audio).float().to(args.device)
                     x1_emb = model(audio[None])[0]
                 embs.append(x1_emb.cpu())
         spk_dict[s] = torch.stack(embs, dim=0)
     print("Embeddings for umap gathered, computing transform.")
-    project_umap(spk_dict)
+    project_umap(spk_dict, args.seed)
 
-def project_umap(spk_dict: Dict[str,Tensor]):
+def project_umap(spk_dict: Dict[str,Tensor], seed):
     sorted_speakers = sorted(list(spk_dict.keys()))
     flat_embs = torch.cat([spk_dict[k] for k in sorted_speakers], dim=0).numpy()
     try:
@@ -93,7 +98,7 @@ def project_umap(spk_dict: Dict[str,Tensor]):
     except ModuleNotFoundError:
         raise ModuleNotFoundError('Please install umap, sklearn, and matplotlib from pypi to plot umap results.')
     data = StandardScaler().fit_transform(flat_embs)
-    reducer = UMAP(metric='cosine', verbose=True)
+    reducer = UMAP(metric='cosine', verbose=True, n_neighbors=20, random_state=seed)
     reduced_data = reducer.fit_transform(data)
     print(reduced_data.shape)
     fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(16, 9))
@@ -103,6 +108,9 @@ def project_umap(spk_dict: Dict[str,Tensor]):
     ax.legend(sorted_speakers)
     ax.set_xlabel('umap 1st component')
     ax.set_ylabel('umap 2nd component')
+    ax.set_title("2D umap projection with n_neighbors=20")
+    ax.grid(True)
+    plt.tight_layout()
     plt.savefig('umap_plot.svg')
     print("Saved umap plot to umap_plot.svg")
 
