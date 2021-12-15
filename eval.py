@@ -14,7 +14,7 @@ def eval(args):
     if args.model == 'gru_embedder':
         model = torch.hub.load('RF5/simple-speaker-embedding', 'gru_embedder')
     elif args.model == 'convgru_embedder':
-        model = torch.hub.load('RF5/simple-speaker-embedding', 'convgru_embedder', force_reload=True)
+        model = torch.hub.load('RF5/simple-speaker-embedding', 'convgru_embedder')
     else: raise NotImplementedError()
     print(args)
     model = model.eval().to(args.device)

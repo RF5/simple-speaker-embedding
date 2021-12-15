@@ -70,7 +70,7 @@ class ConvGRUEmbedder(nn.Module):
         x = x.to(self.device)
         lengths = torch.ones((1,), dtype=torch.long, device=x.device)*x.shape[-1]
         x = x.unsqueeze(1) # account for (utters per speaker) dimension 
-        return self.model(x, lengths)
+        return self.model(x, lengths).squeeze(1)
 
     def print_hparams(self):
         from omegaconf import OmegaConf
