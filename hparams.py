@@ -1,5 +1,6 @@
 
 class hp():
+    """ Hyperparameters for the `gru_embedder` model """
         
     class audio_waveglow():
         filter_length = 1024
