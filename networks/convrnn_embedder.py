@@ -69,7 +69,7 @@ class ConvEncoder(nn.Module):
 
 class ConvRNNEmbedder(nn.Module):
 
-    def __init__(self, cfg:ConvRNNConfig, mode='train'): #conv_cfg, n_hid=768, n_conv=512, n_layers=3, fc_dim=256, hidden_p=0.3, bidir=False):
+    def __init__(self, cfg:ConvRNNConfig, mode='train'):
         super().__init__()    
         self.rnn_dim = cfg.n_hid
         self.conv_encoder = ConvEncoder(cfg.conv_cfg)
