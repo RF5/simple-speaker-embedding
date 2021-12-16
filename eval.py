@@ -12,9 +12,17 @@ from fastprogress.fastprogress import progress_bar
 
 def eval(args):
     if args.model == 'gru_embedder':
-        model = torch.hub.load('RF5/simple-speaker-embedding', 'gru_embedder')
+        model = torch.hub.load('RF5/simple-speaker-embedding', 'gru_embedder').to(args.device)
+        if args.checkpoint_override is not None:
+            print(f"Loading override checkpoint from {args.checkpoint_override}")
+            ckpt = torch.load(args.checkpoint_override, map_location=args.device)
+            model.load_state_dict(ckpt)
     elif args.model == 'convgru_embedder':
-        model = torch.hub.load('RF5/simple-speaker-embedding', 'convgru_embedder')
+        model = torch.hub.load('RF5/simple-speaker-embedding', 'convgru_embedder').to(args.device)
+        if args.checkpoint_override is not None:
+            print(f"Loading override checkpoint from {args.checkpoint_override}")
+            ckpt = torch.load(args.checkpoint_override, map_location=args.device)
+            model.model.load_state_dict(ckpt['model_state_dict'])
     else: raise NotImplementedError()
     print(args)
     model = model.eval().to(args.device)
