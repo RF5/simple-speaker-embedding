@@ -91,7 +91,7 @@ Furthermore, the test utterances are not cropped or reduced in length, but rathe
 This means that the test results here are pessimistic. You will obtain better numbers by cropping utterances to reasonable lengths (4-8s), and taking the mean speaker embedding from multiple utterances or multiple parts of a single long utterance, or both, and then only using this mean embedding vector when comparing to embeddings for other speakers. 
 
 | model | test-clean EER | test-other EER | 
-| ----------- | ----------- | --- |
+| ----------- | :-----------: | :----: |
 | `gru_embedder`      | 0.0797 | 0.0766 | 
 | `convgru_embedder`   | 0.0295 | 0.0181 | 
 
