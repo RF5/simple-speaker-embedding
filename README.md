@@ -90,10 +90,10 @@ Concretely, all speakers included in this evaluation are not seen during trainin
 Furthermore, the test utterances are not cropped or reduced in length, but rather the model is applied directly to the full length waveform.
 This means that the test results here are pessimistic. You will obtain better numbers by cropping utterances to reasonable lengths (4-8s), and taking the mean speaker embedding from multiple utterances or multiple parts of a single long utterance, or both, and then only using this mean embedding vector when comparing to embeddings for other speakers. 
 
-| model | test-clean EER | test-other EER | 
+| model | test-clean EER (%) | test-other EER (%) | 
 | ----------- | :-----------: | :----: |
-| `gru_embedder`      | 0.0797 | 0.0766 | 
-| `convgru_embedder`   | 0.0295 | 0.0181 | 
+| `gru_embedder`      | 7.97 | 7.66 | 
+| `convgru_embedder`   | 2.95 | 1.81 | 
 
 We can also compare the model performance for the same set of unseen speakers side-by-side. Namely, below is a 2D UMAP projection for several embeddings colored by speaker where each point is the embedding for a particular utterance. 
 
