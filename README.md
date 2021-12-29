@@ -17,9 +17,9 @@ This repo provides two pretrained models:
 1. A `GRU` recurrent model (3 layers, 786 hidden units each) which operates on log Mel-scale spectrogram frames computed from 22.05kHz sampled audio.
 2. A `ConvGRU` model which consists of an initial convolutional encoder network into a GRU (3 layers, 786 hidden units each). This network operates on raw, un-normalized 16kHz waveforms. 
 
-These are summarized below, where the speaker embeddings $\mathbf{s}$ are of dimension $d$:
+These are summarized below, where the speaker embeddings are of dimension d:
 
-| torchub model | sample rate | training datasets | input format | $d$ | release |
+| torchub model | sample rate | training datasets | input format | d | release |
 | ----------- | ----------- | --- | --- | --- | --- |
 | `gru_embedder`      | 22.05khz | VCC 2018, VCTK, Librispeech, CommonVoice English | log mel-scale spectrogram | 256 | [Nov 2020](https://github.com/RF5/simple-speaker-embedding/releases/tag/0.1) |
 | `convgru_embedder`   | 16kHz | VCTK, Librispeech, voxceleb1, voxceleb2 | raw waveform | 256 | [Dec 2021](https://github.com/RF5/simple-speaker-embedding/releases/tag/v1.0) |
