@@ -66,6 +66,7 @@ mel = model.melspec_from_file('example.wav')
 # if you were using the `convgru_embedder`, you can go:
 # import librosa
 # wav, _ = librosa.load('example.wav', sr=16000)
+# wav = torch.from_numpy(wav).float()
 ```
 Alternatively, if you already have a loaded waveform as a 1D Pytorch float tensor between -1 and 1, then you can also use `mel = model.melspec_from_array(x)` for 1D torch vector `x`. 
 

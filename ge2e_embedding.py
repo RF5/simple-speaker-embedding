@@ -68,7 +68,7 @@ class ConvGRUEmbedder(nn.Module):
         """ Takes in set of 16kHz waveforms (bs, n_samples) and returns (bs, 256) speaker embeddings """
         x = x.clamp(-1.0 , 1.0)
         x = x.to(self.device)
-        lengths = torch.ones((1,), dtype=torch.long, device=x.device)*x.shape[-1]
+        lengths = torch.ones((x.shape[0],), dtype=torch.long, device=x.device)*x.shape[-1]
         x = x.unsqueeze(1) # account for (utters per speaker) dimension 
         return self.model(x, lengths).squeeze(1)
 
