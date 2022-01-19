@@ -91,7 +91,7 @@ Concretely, all speakers included in this evaluation are not seen during trainin
 Furthermore, the test utterances are not cropped or reduced in length, but rather the model is applied directly to the full length waveform.
 This means that the test results here are pessimistic. You will obtain better numbers by cropping utterances to reasonable lengths (4-8s), and taking the mean speaker embedding from multiple utterances or multiple parts of a single long utterance, or both, and then only using this mean embedding vector when comparing to embeddings for other speakers. 
 
-| model | LS test-clean EER (%) | LS test-other EER (%) | voxceleb1 test EER |
+| model | LS test-clean EER (%) | LS test-other EER (%) | voxceleb1 test EER (%) |
 | ----------- | :-----------: | :----: | :---: |
 | `gru_embedder`      | 7.97 | 7.66 | 33.77 |
 | `convgru_embedder`   | 2.95 | 1.81 | 3.20 |
