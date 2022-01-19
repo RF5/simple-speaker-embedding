@@ -77,6 +77,7 @@ def main():
         cat_dfs.append(vox2_df)
 
     full_df = pd.concat(cat_dfs)
+    print("Preliminary number of speakers: ", len(full_df.speaker.unique()))
     full_df['cnt'] = full_df.groupby('speaker')['path'].transform('count')
     full_df = full_df[full_df.cnt > 8] # Trim to only speakers with at least 8 utterances
     full_df.drop('cnt', axis=1)
@@ -90,7 +91,7 @@ def main():
     train_df = full_df[full_df.speaker.isin(train_spks)]
     print(f"Finished constructing train df of {len(train_df):,d} utterances.")
     valid_df = full_df[full_df.speaker.isin(valid_spks)]
-    print(f"Finished constructing valid df of {len(valid_df):,d} utterances.")
+    print(f"Finished constructing valid df of {len(valid_df):,d} utterances ({len(valid_df.speaker.unique())} speakers).")
     os.makedirs('splits', exist_ok=True)
     train_df.to_csv("splits/train.csv.zip", index=False, compression='zip')
     valid_df.to_csv("splits/valid.csv.zip", index=False, compression='zip')

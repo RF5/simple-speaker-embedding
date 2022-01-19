@@ -86,15 +86,15 @@ Yes, to a pretty good extent. For example, below we plot the 2D t-SNE projection
 As is seen, utterances spoken by the same speaker are closely clustered, while utterances by different speakers remain well separated. This indicates good embedding behavior.
 
 ## Performance
-Performance is given on Librispeech `test-clean` and `test-other` datasets. These datasets consist of completely unseen speakers to all the models.
+Performance is given on Librispeech (LS) `test-clean` and `test-other` datasets and on the voxceleb1 `test` dataset. These datasets consist of completely unseen speakers to all the models.
 Concretely, all speakers included in this evaluation are not seen during training or validation.
 Furthermore, the test utterances are not cropped or reduced in length, but rather the model is applied directly to the full length waveform.
 This means that the test results here are pessimistic. You will obtain better numbers by cropping utterances to reasonable lengths (4-8s), and taking the mean speaker embedding from multiple utterances or multiple parts of a single long utterance, or both, and then only using this mean embedding vector when comparing to embeddings for other speakers. 
 
-| model | test-clean EER (%) | test-other EER (%) | 
-| ----------- | :-----------: | :----: |
-| `gru_embedder`      | 7.97 | 7.66 | 
-| `convgru_embedder`   | 2.95 | 1.81 | 
+| model | LS test-clean EER (%) | LS test-other EER (%) | voxceleb1 test EER |
+| ----------- | :-----------: | :----: | :---: |
+| `gru_embedder`      | 7.97 | 7.66 | 33.77 |
+| `convgru_embedder`   | 2.95 | 1.81 | 3.20 |
 
 We can also compare the model performance for the same set of unseen speakers side-by-side. Namely, below is a 2D UMAP projection for several embeddings colored by speaker where each point is the embedding for a particular utterance. 
 
