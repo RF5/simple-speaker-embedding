@@ -21,8 +21,8 @@ These are summarized below, where the speaker embeddings are of dimension d:
 
 | torchub model | sample rate | training datasets | input format | d | release |
 | ----------- | ----------- | --- | --- | --- | --- |
-| `gru_embedder`      | 22.05khz | VCC 2018, VCTK, Librispeech, CommonVoice English | log mel-scale spectrogram | 256 | [Nov 2020](https://github.com/RF5/simple-speaker-embedding/releases/tag/0.1) |
-| `convgru_embedder`   | 16kHz | VCTK, Librispeech, voxceleb1, voxceleb2 | raw waveform | 256 | [Dec 2021](https://github.com/RF5/simple-speaker-embedding/releases/tag/v1.0) |
+| `gru_embedder`      | 22.05khz | VCC 2018, VCTK, Librispeech, CommonVoice English | log mel-scale spectrogram | 256 | v0.1 [Nov 2020](https://github.com/RF5/simple-speaker-embedding/releases/tag/0.1) |
+| `convgru_embedder`   | 16kHz | VCTK, Librispeech, voxceleb1, voxceleb2 | raw waveform | 256 | v1.0 [Dec 2021](https://github.com/RF5/simple-speaker-embedding/releases/tag/v1.0) |
 
 **Quick info**:
 - The input utterance can be of arbitrary length, although fairly short (5-10s) work best.
