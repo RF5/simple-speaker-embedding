@@ -111,3 +111,20 @@ def convgru_embedder(pretrained=True, progress=True, device='cuda'):
         model.eval()
 
     return model
+
+def convgru_embedder_sc09(pretrained=True, progress=True, device='cuda'):
+    r""" 
+    GRU embedding model trained on the Google Speech Commands digits dataset.
+    Args:
+        pretrained (bool): load pretrained weights into the model
+        progress (bool): show progress bar when downloading model
+        device (str): device to load model onto ('cuda' or 'cpu' are common choices)
+    """
+    model = ConvGRUEmbedder(device=device)
+    if pretrained:
+        ckpt = torch.hub.load_state_dict_from_url("https://github.com/RF5/simple-speaker-embedding/releases/download/0.1/convgru_sc09_ckpt_00077500-strip.pt", 
+                                                progress=progress, map_location=device)
+        model.model.load_state_dict(ckpt['model_state_dict'])
+        model.eval()
+
+    return model
