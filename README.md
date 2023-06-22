@@ -33,7 +33,7 @@ These are summarized below, where the speaker embeddings are of dimension d:
 
 # Quick start
 No cloning repos or downloading notebooks needed! Simply:
-1. Ensure you have `pytorch`, `torchaudio`, `librosa`, `numpy`, `scipy`, and `omegaconf` python packages installed (`umap`, `sklearn`, and `matplotlib` also required for training/benchmarking). 
+1. Ensure you have `pytorch`, `torchaudio`, `librosa==0.9.2`, `numpy`, `scipy`, and `omegaconf` python packages installed (`umap`, `sklearn`, and `matplotlib` also required for training/benchmarking). 
 2. Run: 
    ```python
     import torch
